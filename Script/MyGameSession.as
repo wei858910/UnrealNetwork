@@ -1,0 +1,4 @@
+class AMyGameSession : AGameSession
+{
+    
+};
