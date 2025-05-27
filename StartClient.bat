@@ -1,0 +1,1 @@
+UnrealEditor.exe %~dp0UnrealNetwork.uproject 127.0.0.1 -game
