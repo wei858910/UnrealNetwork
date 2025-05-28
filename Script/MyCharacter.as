@@ -30,6 +30,9 @@ class AMyCharacter : ACharacter
     UPROPERTY(Category = "Input")
     UInputAction IA_Jump = Cast<UInputAction>(LoadObject(nullptr, "/Game/ThirdPerson/Input/Actions/IA_Jump.IA_Jump"));
 
+    UPROPERTY(Category = "Input")
+    UInputAction IA_Test = Cast<UInputAction>(LoadObject(nullptr, "/Game/ThirdPerson/Input/Actions/IA_Test.IA_Test"));
+
     default bUseControllerRotationYaw = false;
 
     default CharacterMovement.bOrientRotationToMovement = true;
@@ -44,10 +47,6 @@ class AMyCharacter : ACharacter
     default Sphere.StaticMesh = Cast<UStaticMesh>(LoadObject(nullptr, "/Engine/EditorMeshes/EditorSphere.EditorSphere"));
     default Sphere.SetRelativeScale3D(FVector(0.1, 0.1, 0.1));
     default Sphere.SetMaterial(0, SphereMaterial);
-
-    float SphereChagneColorInterval = 2.0;
-
-    float IntervalTime = 0.0;
 
     UFUNCTION(BlueprintOverride)
     void ControllerChanged(AController OldController, AController NewController)
@@ -77,7 +76,20 @@ class AMyCharacter : ACharacter
                 InputComponent.BindAction(IA_Jump, ETriggerEvent::Started, FEnhancedInputActionHandlerDynamicSignature(this, n"OnJump"));
                 InputComponent.BindAction(IA_Jump, ETriggerEvent::Completed, FEnhancedInputActionHandlerDynamicSignature(this, n"OnStopJump"));
             }
+            if (IsValid(IA_Test))
+            {
+                InputComponent.BindAction(IA_Test, ETriggerEvent::Started, FEnhancedInputActionHandlerDynamicSignature(this, n"OnTest"));
+            }
         }
+    }
+
+    UFUNCTION()
+    private void OnTest(FInputActionValue ActionValue, float32 ElapsedTime, float32 TriggeredTime, const UInputAction SourceAction)
+    {
+
+        ServerChangeSphereColor();
+
+        ServerChangeOtherCharacterSphereColor();
     }
 
     UFUNCTION()
@@ -137,15 +149,34 @@ class AMyCharacter : ACharacter
     }
 
     UFUNCTION(Server)
-    void ServerChangeColor()
+    void ServerChangeSphereColor()
     {
-        MultiChangeColor(MakeRandomColor());
+        MultiChangeSphereColor(MakeRandomColor());
     }
 
     UFUNCTION(NetMulticast)
-    void MultiChangeColor(FVector Color)
+    void MultiChangeSphereColor(FVector Color)
     {
         Sphere.SetVectorParameterValueOnMaterials(n"Color", Color);
+    }
+
+    UFUNCTION(Server)
+    void ServerChangeOtherCharacterSphereColor()
+    {
+        FVector            Location = GetActorLocation();
+        TArray<FHitResult> HitResults;
+        TArray<AActor>     ActorsToIgnore;
+        ActorsToIgnore.Add(this);
+        System::SphereTraceMulti(Location, Location, 150, ETraceTypeQuery::Camera, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResults, true);
+        for (auto Result : HitResults)
+        {
+            AMyCharacter Char = Cast<AMyCharacter>(Result.Actor);
+            if (IsValid(Char))
+            {
+                Char.MultiChangeSphereColor(MakeRandomColor());
+                break;
+            }
+        }
     }
 
     UFUNCTION(BlueprintOverride)
@@ -173,12 +204,5 @@ class AMyCharacter : ACharacter
         // FVector Location = GetActorLocation();
         // Location.Z += 100.0;
         // System::DrawDebugString(Location, FString(f"{GetRemoteRole()}"), nullptr, Color);
-
-        IntervalTime += DeltaSeconds;
-        if (IntervalTime >= SphereChagneColorInterval)
-        {
-            ServerChangeColor();
-            IntervalTime = 0.0;
-        }
     }
 };
