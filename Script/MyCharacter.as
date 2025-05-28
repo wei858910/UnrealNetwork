@@ -104,5 +104,11 @@ class AMyCharacter : ACharacter
     UFUNCTION(BlueprintOverride)
     void BeginPlay()
     {
+        APlayerController PlayerController = Cast<APlayerController>(Controller);
+        if (IsValid(PlayerController))
+        {
+            PlayerController.bShowMouseCursor = true;
+            Widget::SetInputMode_GameAndUIEx(PlayerController, nullptr, EMouseLockMode::DoNotLock, false);
+        }
     }
 };
