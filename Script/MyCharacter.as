@@ -111,4 +111,19 @@ class AMyCharacter : ACharacter
             Widget::SetInputMode_GameAndUIEx(PlayerController, nullptr, EMouseLockMode::DoNotLock, false);
         }
     }
+
+    UFUNCTION(BlueprintOverride)
+    void Tick(float DeltaSeconds)
+    {
+        if (HasAuthority())
+        {
+            FString HaveController = IsValid(Controller) ? "Server: 有Controller" : "Server: 没有Controller";
+            System::DrawDebugString(GetActorLocation(), HaveController, nullptr, FLinearColor::Red);
+        }
+        else
+        {
+            FString HaveController = IsValid(Controller) ? "Client: 有Controller" : "Client: 没有Controller";
+            System::DrawDebugString(GetActorLocation(), HaveController, nullptr, FLinearColor::Blue);
+        }
+    }
 };

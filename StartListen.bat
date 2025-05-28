@@ -1,0 +1,1 @@
+UnrealEditor.exe %~dp0UnrealNetwork.uproject ThirdPersonMap?Listen -game
