@@ -115,15 +115,27 @@ class AMyCharacter : ACharacter
     UFUNCTION(BlueprintOverride)
     void Tick(float DeltaSeconds)
     {
-        if (HasAuthority())
-        {
-            FString HaveController = IsValid(Controller) ? "Server: 有Controller" : "Server: 没有Controller";
-            System::DrawDebugString(GetActorLocation(), HaveController, nullptr, FLinearColor::Red);
-        }
-        else
-        {
-            FString HaveController = IsValid(Controller) ? "Client: 有Controller" : "Client: 没有Controller";
-            System::DrawDebugString(GetActorLocation(), HaveController, nullptr, FLinearColor::Blue);
-        }
+        // if (HasAuthority())
+        // {
+        //     FString HaveController = IsValid(Controller) ? "Server: 有Controller" : "Server: 没有Controller";
+        //     System::DrawDebugString(GetActorLocation(), HaveController, nullptr, FLinearColor::Red);
+        // }
+        // else
+        // {
+        //     FString HaveController = IsValid(Controller) ? "Client: 有Controller" : "Client: 没有Controller";
+        //     System::DrawDebugString(GetActorLocation(), HaveController, nullptr, FLinearColor::Blue);
+        // }
+
+        // GetLocalRole()
+        // FLinearColor Color = HasAuthority() ? FLinearColor::Red : FLinearColor::Blue;
+        // FVector Location = GetActorLocation();
+        // Location.Z += 100.0;
+        // System::DrawDebugString(Location, FString(f"{GetLocalRole()}"), nullptr, Color);
+
+        // GetRemoteRole()
+        // FLinearColor Color = HasAuthority() ? FLinearColor::Red : FLinearColor::Blue;
+        // FVector Location = GetActorLocation();
+        // Location.Z += 100.0;
+        // System::DrawDebugString(Location, FString(f"{GetRemoteRole()}"), nullptr, Color);
     }
 };
