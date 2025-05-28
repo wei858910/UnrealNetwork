@@ -34,6 +34,21 @@ class AMyCharacter : ACharacter
 
     default CharacterMovement.bOrientRotationToMovement = true;
 
+    UMaterialInterface SphereMaterial = Cast<UMaterialInterface>(LoadObject(nullptr, "/Game/Mat/M_Ball.M_Ball"));
+
+    UPROPERTY(DefaultComponent)
+    UStaticMeshComponent Sphere;
+    default Sphere.SetCollisionProfileName(n"NoCollision");
+    default Sphere.SetCollisionEnabled(ECollisionEnabled::NoCollision);
+    default Sphere.SetRelativeLocation(FVector(0.0, 0.0, 110.0));
+    default Sphere.StaticMesh = Cast<UStaticMesh>(LoadObject(nullptr, "/Engine/EditorMeshes/EditorSphere.EditorSphere"));
+    default Sphere.SetRelativeScale3D(FVector(0.1, 0.1, 0.1));
+    default Sphere.SetMaterial(0, SphereMaterial);
+
+    float SphereChagneColorInterval = 2.0;
+
+    float IntervalTime = 0.0;
+
     UFUNCTION(BlueprintOverride)
     void ControllerChanged(AController OldController, AController NewController)
     {
@@ -112,6 +127,27 @@ class AMyCharacter : ACharacter
         }
     }
 
+    FVector MakeRandomColor()
+    {
+        float R = Math::RandRange(0.0, 1.0);
+        float G = Math::RandRange(0.0, 1.0);
+        float B = Math::RandRange(0.0, 1.0);
+
+        return FVector(R, G, B);
+    }
+
+    UFUNCTION(Server)
+    void ServerChangeColor()
+    {
+        MultiChangeColor(MakeRandomColor());
+    }
+
+    UFUNCTION(NetMulticast)
+    void MultiChangeColor(FVector Color)
+    {
+        Sphere.SetVectorParameterValueOnMaterials(n"Color", Color);
+    }
+
     UFUNCTION(BlueprintOverride)
     void Tick(float DeltaSeconds)
     {
@@ -137,5 +173,12 @@ class AMyCharacter : ACharacter
         // FVector Location = GetActorLocation();
         // Location.Z += 100.0;
         // System::DrawDebugString(Location, FString(f"{GetRemoteRole()}"), nullptr, Color);
+
+        IntervalTime += DeltaSeconds;
+        if (IntervalTime >= SphereChagneColorInterval)
+        {
+            ServerChangeColor();
+            IntervalTime = 0.0;
+        }
     }
 };
