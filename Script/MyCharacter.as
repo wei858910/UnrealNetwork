@@ -33,6 +33,9 @@ class AMyCharacter : ACharacter
     UPROPERTY(Category = "Input")
     UInputAction IA_Test = Cast<UInputAction>(LoadObject(nullptr, "/Game/ThirdPerson/Input/Actions/IA_Test.IA_Test"));
 
+    UPROPERTY(Category = "Input")
+    UInputAction IA_Tab = Cast<UInputAction>(LoadObject(nullptr, "/Game/ThirdPerson/Input/Actions/IA_Tab.IA_Tab"));
+
     default bUseControllerRotationYaw = false;
 
     default CharacterMovement.bOrientRotationToMovement = true;
@@ -47,6 +50,8 @@ class AMyCharacter : ACharacter
     default Sphere.StaticMesh = Cast<UStaticMesh>(LoadObject(nullptr, "/Engine/EditorMeshes/EditorSphere.EditorSphere"));
     default Sphere.SetRelativeScale3D(FVector(0.1, 0.1, 0.1));
     default Sphere.SetMaterial(0, SphereMaterial);
+
+    UUserWidget UmgChat;
 
     UFUNCTION(BlueprintOverride)
     void ControllerChanged(AController OldController, AController NewController)
@@ -80,6 +85,36 @@ class AMyCharacter : ACharacter
             {
                 InputComponent.BindAction(IA_Test, ETriggerEvent::Started, FEnhancedInputActionHandlerDynamicSignature(this, n"OnTest"));
             }
+            if (IsValid(IA_Tab))
+            {
+                InputComponent.BindAction(IA_Tab, ETriggerEvent::Started, FEnhancedInputActionHandlerDynamicSignature(this, n"OnTab"));
+            }
+        }
+    }
+
+    UFUNCTION()
+    private void OnTab(FInputActionValue ActionValue, float32 ElapsedTime, float32 TriggeredTime, const UInputAction SourceAction)
+    {
+        UClass UmgChatClass = Cast<UClass>(LoadObject(nullptr, "/Game/HUD/BP_UMGChat.BP_UMGChat_C"));
+        if (!IsValid(UmgChatClass))
+            return;
+        APlayerController PC = Cast<APlayerController>(Controller);
+        if (!IsValid(PC))
+            return;
+
+        if (!IsValid(UmgChat))
+        {
+            UmgChat = WidgetBlueprint::CreateWidget(UmgChatClass, PC);
+            if (!IsValid(UmgChat))
+                return;
+            PC.bShowMouseCursor = true;
+            UmgChat.AddToViewport();
+        }
+        else
+        {
+            UmgChat.RemoveFromParent();
+            UmgChat = nullptr;
+            PC.bShowMouseCursor = false;
         }
     }
 
