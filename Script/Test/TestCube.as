@@ -44,6 +44,8 @@ class ATestCube : AActor
 
     FVector MakeRandomColor()
     {
-        return FVector(Math::RandRange(0.0, 1.0), Math::RandRange(0.0, 1.0), Math::RandRange(0.0, 1.0));
+        int32         Seed = Math::RoundToInt(Gameplay::GetRealTimeSeconds());
+        FRandomStream RandomStream(Seed);
+        return FVector(RandomStream.RandRange(0.0, 1.0), RandomStream.RandRange(0.0, 1.0), RandomStream.RandRange(0.0, 1.0));
     }
 };
