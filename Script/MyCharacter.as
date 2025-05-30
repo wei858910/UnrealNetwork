@@ -87,9 +87,11 @@ class AMyCharacter : ACharacter
     private void OnTest(FInputActionValue ActionValue, float32 ElapsedTime, float32 TriggeredTime, const UInputAction SourceAction)
     {
 
-        ServerChangeSphereColor();
+        // ServerChangeSphereColor();
 
-        ServerChangeOtherCharacterSphereColor();
+        // ServerChangeOtherCharacterSphereColor();
+
+        ChangeCubeColor();
     }
 
     UFUNCTION()
@@ -177,6 +179,51 @@ class AMyCharacter : ACharacter
                 break;
             }
         }
+    }
+
+    void ChangeCubeColor()
+    {
+        if (!ServerChangeCubeOwner()) // 先改变Cube的Owner，否则Client无法改变Cube的颜色
+        {
+            FVector            Location = GetActorLocation();
+            TArray<FHitResult> HitResults;
+            TArray<AActor>     ActorsToIgnore;
+            ActorsToIgnore.Add(this);
+            System::SphereTraceMulti(Location, Location, 150, ETraceTypeQuery::Camera, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResults, true);
+            for (auto Result : HitResults)
+            {
+                ATestCube Cube = Cast<ATestCube>(Result.Actor);
+                if (IsValid(Cube))
+                {
+                    Cube.NetChangeColor();
+                    break;
+                }
+            }
+        }
+    }
+
+    UFUNCTION(Server)
+    bool ServerChangeCubeOwner()
+    {
+        FVector            Location = GetActorLocation();
+        TArray<FHitResult> HitResults;
+        TArray<AActor>     ActorsToIgnore;
+        ActorsToIgnore.Add(this);
+        System::SphereTraceMulti(Location, Location, 150, ETraceTypeQuery::Camera, false, ActorsToIgnore, EDrawDebugTrace::ForDuration, HitResults, true);
+        for (auto Result : HitResults)
+        {
+            ATestCube Cube = Cast<ATestCube>(Result.Actor);
+            if (IsValid(Cube))
+            {
+                if (Cube.Owner != GetController())
+                {
+                    Cube.SetOwner(GetController());
+                    Cube.NetChangeColor();
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     UFUNCTION(BlueprintOverride)
