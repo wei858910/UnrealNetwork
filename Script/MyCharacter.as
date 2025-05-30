@@ -91,7 +91,9 @@ class AMyCharacter : ACharacter
 
         // ServerChangeOtherCharacterSphereColor();
 
-        ChangeCubeColor();
+        // ChangeCubeColor();
+
+        ServerChangeOwnSphereColor();
     }
 
     UFUNCTION()
@@ -148,6 +150,18 @@ class AMyCharacter : ACharacter
         float B = Math::RandRange(0.0, 1.0);
 
         return FVector(R, G, B);
+    }
+
+    UFUNCTION(Server)
+    void ServerChangeOwnSphereColor()
+    {
+        ClientChangeOwnSphereColor(MakeRandomColor());
+    }
+
+    UFUNCTION(Client)
+    void ClientChangeOwnSphereColor(FVector Color)
+    {
+        Sphere.SetVectorParameterValueOnMaterials(n"Color", Color);
     }
 
     UFUNCTION(Server)
