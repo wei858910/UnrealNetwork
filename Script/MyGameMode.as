@@ -1,4 +1,4 @@
-class AMyGameMode : AGameModeBase
+class AMyGameMode : AGameMode
 {
     default DefaultPawnClass = AMyCharacter;
     default GameSessionClass = AMyGameSession;

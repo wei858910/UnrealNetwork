@@ -1,10 +1,10 @@
 class UWidgetTitle : UUserWidget
 {
 	UPROPERTY(BindWidget)
-	UTextBlock BH;
+	UTextBlock Clan;
 
 	UPROPERTY(BindWidget)
-	UTextBlock NC;
+	UTextBlock NickName;
     
 	UFUNCTION(BlueprintOverride)
 	void Construct()

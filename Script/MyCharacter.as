@@ -53,6 +53,12 @@ class AMyCharacter : ACharacter
 
     UUserWidget UmgChat;
 
+    UPROPERTY(DefaultComponent)
+    UWidgetComponent WidgetTitle;
+    default WidgetTitle.WidgetClass = Cast<UClass>(LoadObject(nullptr, "/Game/HUD/UBP_Title.UBP_Title_C"));
+    default WidgetTitle.SetRelativeLocation(FVector(0.0, 0.0, 100.0));
+    default WidgetTitle.SetWidgetSpace(EWidgetSpace::Screen);
+
     UFUNCTION(BlueprintOverride)
     void ControllerChanged(AController OldController, AController NewController)
     {
