@@ -73,15 +73,12 @@ class UUMGChat : UUserWidget
         {
 
             case EChatChannel::ECC_World:
+            case EChatChannel::ECC_Group:
             {
                 TextBlock.SetColorAndOpacity(Color);
                 FText Text = FText::FromString(FString::Format("[{0}]: {1}", ChannelName.ToString(), Message));
                 TextBlock.SetText(Text);
                 ScrollBox_Chat.AddChild(TextBlock);
-            }
-            break;
-            case EChatChannel::ECC_Group:
-            {
             }
             break;
             case EChatChannel::ECC_Private:

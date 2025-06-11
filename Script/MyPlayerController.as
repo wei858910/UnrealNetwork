@@ -13,8 +13,45 @@ class AMyPlayerController : APlayerController
         {
             FString PlayerName = GetPlayerName();
             FString PlayerGroup = GetPlayerGroup();
-            FString NewMessage = FString::Format("{0}:{1} {2}", PlayerGroup, PlayerName, Message);
-            MyGameState.MultiSendMessage(Channel, NewMessage);
+            FString NewMessage = FString::Format("{0}:{1}", PlayerName, Message);
+
+            switch (Channel)
+            {
+                case EChatChannel::ECC_World:
+                    MyGameState.MultiSendMessage(Channel, NewMessage);
+                    break;
+                case EChatChannel::ECC_Group:
+                {
+                    for (auto PS : MyGameState.PlayerArray)
+                    {
+                        AMyPlayerState MyPlayerState = Cast<AMyPlayerState>(PS.Get());
+                        if (IsValid(MyPlayerState))
+                        {
+                            if (MyPlayerState.PlayerGroup == PlayerGroup)
+                            {
+                                AMyPlayerController MyPlayerController = Cast<AMyPlayerController>(MyPlayerState.Pawn.GetInstigatorController());
+                                if (IsValid(MyPlayerController))
+                                {
+                                    MyPlayerController.ClientSendMessage(Channel, NewMessage);
+                                }
+                            }
+                        }
+                    }
+                }
+                break;
+                case EChatChannel::ECC_Private:
+                    break;
+            }
+        }
+    }
+
+    UFUNCTION(Client)
+    void ClientSendMessage(EChatChannel Channel, FString Message)
+    {
+        AMyHUD MyHUD = Cast<AMyHUD>(GetHUD());
+        if (IsValid(MyHUD))
+        {
+            MyHUD.PushMessage(Channel, Message);
         }
     }
 
