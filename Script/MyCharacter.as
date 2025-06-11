@@ -101,26 +101,11 @@ class AMyCharacter : ACharacter
     UFUNCTION()
     private void OnTab(FInputActionValue ActionValue, float32 ElapsedTime, float32 TriggeredTime, const UInputAction SourceAction)
     {
-        UClass UmgChatClass = Cast<UClass>(LoadObject(nullptr, "/Game/HUD/BP_UMGChat.BP_UMGChat_C"));
-        if (!IsValid(UmgChatClass))
-            return;
-        APlayerController PC = Cast<APlayerController>(Controller);
-        if (!IsValid(PC))
-            return;
-
-        if (!IsValid(UmgChat))
+        auto   PlayerController = Gameplay::GetPlayerController(0);
+        AMyHUD MyHUD = Cast<AMyHUD>(PlayerController.GetHUD());
+        if (IsValid(MyHUD))
         {
-            UmgChat = WidgetBlueprint::CreateWidget(UmgChatClass, PC);
-            if (!IsValid(UmgChat))
-                return;
-            PC.bShowMouseCursor = true;
-            UmgChat.AddToViewport();
-        }
-        else
-        {
-            UmgChat.RemoveFromParent();
-            UmgChat = nullptr;
-            PC.bShowMouseCursor = false;
+            MyHUD.ToggleChatUI();
         }
     }
 

@@ -5,6 +5,7 @@ class AMyGameMode : AGameMode
     default GameStateClass = AMyGameState;
     default PlayerControllerClass = AMyPlayerController;
     default PlayerStateClass = AMyPlayerState;
+    default HUDClass = AMyHUD;
 
     UFUNCTION(BlueprintOverride)
     void BeginPlay()

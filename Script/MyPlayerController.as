@@ -2,13 +2,7 @@ class AMyPlayerController : APlayerController
 {
     void SendMessage(EChatChannel Channel, FString Message)
     {
-        if (HasAuthority())
-        {
-        }
-        else
-        {
-            ServerSendMessage(Channel, Message);
-        }
+        ServerSendMessage(Channel, Message);
     }
 
     UFUNCTION(Server)

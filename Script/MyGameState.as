@@ -1,18 +1,16 @@
 class AMyGameState : AGameState
 {
-    
+
     UFUNCTION(NetMulticast)
     void MultiSendMessage(EChatChannel Channel, FString Message)
     {
-        switch (Channel)
-        {
-            case EChatChannel::ECC_World:
-                Print(f"{Channel}: {Message}");
-                break;
-            case EChatChannel::ECC_Group:
-                break;
-            case EChatChannel::ECC_Private:
-                break;
-        }
+        auto PlayerCotnroller = Cast<APlayerController>(Gameplay::GetPlayerController(0));
+        if (!IsValid(PlayerCotnroller))
+            return;
+
+        auto MyHUD = Cast<AMyHUD>(PlayerCotnroller.GetHUD());
+        if (!IsValid(MyHUD))
+            return;
+        MyHUD.PushMessage(Channel, Message);
     }
 };

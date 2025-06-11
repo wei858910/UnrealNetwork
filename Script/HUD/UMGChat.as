@@ -15,6 +15,9 @@ class UUMGChat : UUserWidget
     UPROPERTY(BindWidget)
     UComboBoxString CBS_Channel;
 
+    UPROPERTY(BindWidget)
+    UScrollBox ScrollBox_Chat;
+
     UFUNCTION(BlueprintOverride)
     void Construct()
     {
@@ -43,6 +46,34 @@ class UUMGChat : UUserWidget
             {
                 MyPlayerController.SendMessage(MyPlayerController.GetChatChanellByString(CBS_Channel.GetSelectedOption()), Text.ToString());
             }
+        }
+    }
+
+    void PushChatMessage(EChatChannel Channel, FString Message)
+    {
+        if (!IsValid(ScrollBox_Chat))
+            return;
+        UTextBlock TextBlock = Cast<UTextBlock>(NewObject(ScrollBox_Chat, UTextBlock));
+
+        switch (Channel)
+        {
+            case EChatChannel::ECC_World:
+            {
+                if (IsValid(TextBlock))
+                {
+                    TextBlock.SetText(FText::FromString("世界: " + Message));
+                    ScrollBox_Chat.AddChild(TextBlock);
+                }
+            }
+            break;
+            case EChatChannel::ECC_Group:
+            {
+            }
+            break;
+            case EChatChannel::ECC_Private:
+            {
+            }
+            break;
         }
     }
 };
