@@ -292,4 +292,36 @@ class AMyCharacter : ACharacter
         // Location.Z += 100.0;
         // System::DrawDebugString(Location, FString(f"{GetRemoteRole()}"), nullptr, Color);
     }
+
+    void SetPlayerNameAndGroup(FString PlayerName, FString Group)
+    {
+        ServerSetPlayerNameAndGroup(PlayerName, Group);
+    }
+
+    UFUNCTION(Server)
+    void ServerSetPlayerNameAndGroup(FString PlayerName, FString Group)
+    {
+        MultiSetPlayerNameAndGroup(PlayerName, Group);
+        
+        AMyPlayerState MyPlayerState = Cast<AMyPlayerState>(PlayerState);
+        if (IsValid(MyPlayerState))
+        {
+            MyPlayerState.SetPlayerNameAndGroup(PlayerName, Group);
+        }
+    }
+
+    UFUNCTION(NetMulticast)
+    void MultiSetPlayerNameAndGroup(FString PlayerName, FString Group)
+    {
+
+        if (IsValid(WidgetTitle))
+        {
+            UWidgetTitle Title = Cast<UWidgetTitle>(WidgetTitle.GetWidget());
+            if (IsValid(Title))
+            {
+                Title.NickName.SetText(FText::FromString(PlayerName));
+                Title.Clan.SetText(FText::FromString(Group));
+            }
+        }
+    }
 };

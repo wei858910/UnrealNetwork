@@ -33,6 +33,10 @@ class UUMGChat : UUserWidget
     UFUNCTION()
     private void OnBtnSubmitClicked()
     {
+        AMyCharacter MyCharacter = Cast<AMyCharacter>(Gameplay::GetPlayerCharacter(0));
+        if (!IsValid(MyCharacter))
+            return;
+        MyCharacter.SetPlayerNameAndGroup(ETB_NickName.GetText().ToString(), ETB_Clan.GetText().ToString());
     }
 
     UFUNCTION()
@@ -53,17 +57,27 @@ class UUMGChat : UUserWidget
     {
         if (!IsValid(ScrollBox_Chat))
             return;
+
+        auto PC = Cast<AMyPlayerController>(Gameplay::GetPlayerController(0));
+        if (!IsValid(PC))
+            return;
+
+        FLinearColor Color = PC.GetColorByChatChannel(Channel);
+        FName        ChannelName = PC.GetNameByChatChannel(Channel);
+
         UTextBlock TextBlock = Cast<UTextBlock>(NewObject(ScrollBox_Chat, UTextBlock));
+        if (!IsValid(TextBlock))
+            return;
 
         switch (Channel)
         {
+
             case EChatChannel::ECC_World:
             {
-                if (IsValid(TextBlock))
-                {
-                    TextBlock.SetText(FText::FromString("世界: " + Message));
-                    ScrollBox_Chat.AddChild(TextBlock);
-                }
+                TextBlock.SetColorAndOpacity(Color);
+                FText Text = FText::FromString(FString::Format("[{0}]: {1}", ChannelName.ToString(), Message));
+                TextBlock.SetText(Text);
+                ScrollBox_Chat.AddChild(TextBlock);
             }
             break;
             case EChatChannel::ECC_Group:
